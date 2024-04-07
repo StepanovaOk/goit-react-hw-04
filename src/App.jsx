@@ -48,7 +48,12 @@ function App() {
           },
         }
       );
-      setPhotos(data);
+
+      if (Array.isArray(data.results)) {
+        setPhotos(data.results);
+      } else {
+        setPhotos(data.results.photos);
+      }
     } catch (error) {
       console.error("Error fetching images:", error);
     }
