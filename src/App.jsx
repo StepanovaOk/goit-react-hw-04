@@ -15,60 +15,40 @@ function App() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 4;
+  let response;
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
   };
 
-  const onNextPage = () => {
+  const onNextPage = (event) => {
     setCurrentPage(currentPage + 1);
+    onSubmit(event);
   };
 
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!searchValue) {
+      return;
+    } else {
       setIsLoading(true);
       try {
-        const { data } = await axios.get("https://api.unsplash.com/photos", {
+        response = await axios.get("https://api.unsplash.com/search/photos/", {
           headers: {
             Authorization:
               "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
           },
           params: {
+            query: searchValue,
             per_page: perPage,
             page: currentPage,
           },
         });
-        setPhotos(data);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error);
-        console.error("Error fetching images:", error);
-      }
-    } else {
-      setIsLoading(true);
-      try {
-        const { data } = await axios.get(
-          "https://api.unsplash.com/search/photos/",
-          {
-            headers: {
-              Authorization:
-                "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
-            },
-            params: {
-              query: searchValue,
-              per_page: perPage,
-              page: currentPage,
-            },
-          }
-        );
 
-        console.log(currentPage);
-
-        if (Array.isArray(data.results)) {
-          setPhotos(data.results);
+        if (currentPage === 1) {
+          setPhotos(response.data.results);
         } else {
-          setPhotos(data.results.photos);
+          setPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
         }
       } catch (error) {
         setError(error);
@@ -82,6 +62,11 @@ function App() {
   useEffect(() => {
     onSubmit();
   }, [currentPage]);
+
+  useEffect(() => {
+    setPhotos([]);
+    setCurrentPage(1);
+  }, [searchValue]);
 
   return (
     <div>
