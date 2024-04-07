@@ -36,15 +36,18 @@ function App() {
     event.preventDefault();
     if (!searchValue) return;
     try {
-      const { data } = await axios.get("https://api.unsplash.com/photos", {
-        headers: {
-          Authorization:
-            "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
-        },
-        params: {
-          query: searchValue,
-        },
-      });
+      const { data } = await axios.get(
+        "https://api.unsplash.com/search/photos",
+        {
+          headers: {
+            Authorization:
+              "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
+          },
+          params: {
+            query: searchValue,
+          },
+        }
+      );
       setPhotos(data);
     } catch (error) {
       console.error("Error fetching images:", error);
