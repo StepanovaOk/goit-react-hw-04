@@ -4,10 +4,12 @@ import "./App.css";
 import axios from "axios";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
 import SearchBar from "./components/SearchBar/SearchBar";
+import Loader from "./components/Loader/Loader";
 
 function App() {
   const [photos, setPhotos] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -15,6 +17,7 @@ function App() {
 
   useEffect(() => {
     async function fetchImages() {
+      setIsLoading(true);
       try {
         const { data } = await axios.get("https://api.unsplash.com/photos", {
           headers: {
@@ -23,7 +26,7 @@ function App() {
           },
         });
         setPhotos(data);
-        console.log(data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching images:", error);
       }
@@ -35,6 +38,7 @@ function App() {
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!searchValue) return;
+    setIsLoading(true);
     try {
       const { data } = await axios.get(
         "https://api.unsplash.com/search/photos/",
@@ -56,6 +60,8 @@ function App() {
       }
     } catch (error) {
       console.error("Error fetching images:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,6 +72,11 @@ function App() {
         handleSearchChange={handleSearchChange}
         onSubmit={onSubmit}
       />
+      {isLoading && (
+        <div>
+          <Loader />
+        </div>
+      )}
       <ImageGallery photos={photos} />
     </div>
   );
