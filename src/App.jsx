@@ -37,7 +37,7 @@ function App() {
     if (!searchValue) return;
     try {
       const { data } = await axios.get(
-        "https://api.unsplash.com/search/photos",
+        "https://api.unsplash.com/search/photos/",
         {
           headers: {
             Authorization:
