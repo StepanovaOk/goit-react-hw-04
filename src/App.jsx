@@ -5,11 +5,13 @@ import axios from "axios";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Loader from "./components/Loader/Loader";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 
 function App() {
   const [photos, setPhotos] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -28,6 +30,7 @@ function App() {
         setPhotos(data);
         setIsLoading(false);
       } catch (error) {
+        setError(error);
         console.error("Error fetching images:", error);
       }
     }
@@ -38,6 +41,7 @@ function App() {
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!searchValue) return;
+
     setIsLoading(true);
     try {
       const { data } = await axios.get(
@@ -59,6 +63,7 @@ function App() {
         setPhotos(data.results.photos);
       }
     } catch (error) {
+      setError(error);
       console.error("Error fetching images:", error);
     } finally {
       setIsLoading(false);
@@ -72,11 +77,9 @@ function App() {
         handleSearchChange={handleSearchChange}
         onSubmit={onSubmit}
       />
-      {isLoading && (
-        <div>
-          <Loader />
-        </div>
-      )}
+      {isLoading && <Loader />}
+      {error && <ErrorMessage />}
+      {photos && !photos.length && <ErrorMessage />}
       <ImageGallery photos={photos} />
     </div>
   );
