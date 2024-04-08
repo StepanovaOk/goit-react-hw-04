@@ -7,6 +7,23 @@ import SearchBar from "./components/SearchBar/SearchBar";
 import Loader from "./components/Loader/Loader";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
+import ImageCard from "./components/ImageGallery/ImageCard/ImageCard";
+
+import ReactDOM from "react-dom";
+import ReactModal from "react-modal";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+ReactModal.setAppElement("#root");
 
 function App() {
   const [photos, setPhotos] = useState(null);
@@ -14,6 +31,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
   const perPage = 4;
   let response;
 
@@ -21,9 +40,38 @@ function App() {
     setSearchValue(event.target.value);
   };
 
-  const onNextPage = (event) => {
+  const openModal = (photo) => {
+    setSelectedPhoto(photo);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const onNextPage = async () => {
     setCurrentPage(currentPage + 1);
-    onSubmit(event);
+    setIsLoading(true);
+    try {
+      response = await axios.get("https://api.unsplash.com/search/photos/", {
+        headers: {
+          Authorization:
+            "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
+        },
+        params: {
+          query: searchValue,
+          per_page: perPage,
+          page: currentPage + 1,
+        },
+      });
+
+      setPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
+    } catch (error) {
+      setError(error);
+      console.error("Error fetching images:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSubmit = async () => {
@@ -60,10 +108,6 @@ function App() {
   };
 
   useEffect(() => {
-    onSubmit();
-  }, [currentPage]);
-
-  useEffect(() => {
     setPhotos([]);
     setCurrentPage(1);
   }, [searchValue]);
@@ -78,8 +122,20 @@ function App() {
       {isLoading && <Loader />}
       {error && <ErrorMessage />}
       {photos && !photos.length && <ErrorMessage />}
-      <ImageGallery photos={photos} />
+      <ImageGallery photos={photos} openModal={openModal} />
       {photos && photos.length > 0 && <LoadMoreBtn onNextPage={onNextPage} />}
+      <ReactModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+      >
+        {selectedPhoto && (
+          <img
+            src={selectedPhoto.urls.regular}
+            alt={selectedPhoto.alt_description}
+          />
+        )}
+      </ReactModal>
     </div>
   );
 }
