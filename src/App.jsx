@@ -26,7 +26,7 @@ function App() {
     onSubmit(event);
   };
 
-  const onSubmit = async (event) => {
+  const onSubmit = async () => {
     event.preventDefault();
     if (!searchValue) {
       return;
