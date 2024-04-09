@@ -1,7 +1,9 @@
+import styles from "./LoadMoreBtn.module.css";
+
 const LoadMoreBtn = ({ onNextPage }) => {
   return (
     <div>
-      <button onClick={onNextPage} type="button">
+      <button className={styles.loadMore} onClick={onNextPage} type="button">
         Load more
       </button>
     </div>

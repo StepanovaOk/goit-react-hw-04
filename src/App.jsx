@@ -7,7 +7,7 @@ import SearchBar from "./components/SearchBar/SearchBar";
 import Loader from "./components/Loader/Loader";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
-import ImageCard from "./components/ImageGallery/ImageCard/ImageCard";
+import ImageCard from "./components/ImageCard/ImageCard";
 
 import ReactDOM from "react-dom";
 import ReactModal from "react-modal";
@@ -33,11 +33,11 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const perPage = 4;
+  const perPage = 12;
   let response;
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    setSearchValue(event.target.value.trim());
   };
 
   const openModal = (photo) => {
@@ -119,11 +119,15 @@ function App() {
         handleSearchChange={handleSearchChange}
         onSubmit={onSubmit}
       />
-      {isLoading && <Loader />}
-      {error && <ErrorMessage />}
-      {photos && !photos.length && <ErrorMessage />}
+
       <ImageGallery photos={photos} openModal={openModal} />
       {photos && photos.length > 0 && <LoadMoreBtn onNextPage={onNextPage} />}
+      {isLoading && <Loader />}
+      {error && <ErrorMessage />}
+      {(!photos || (photos.length === 0 && searchValue)) && !isLoading && (
+        <ErrorMessage />
+      )}
+
       <ReactModal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}

@@ -1,9 +1,10 @@
-import ImageCard from "./ImageCard/ImageCard";
+import ImageCard from "../ImageCard/ImageCard";
+import styles from "./ImageGallery.module.css";
 
 const ImageGallery = ({ photos, openModal }) => {
   return (
     <div>
-      <ul>
+      <ul className={styles.imgList}>
         {photos &&
           photos.map((photo) => {
             return (
