@@ -1,4 +1,5 @@
 import styles from "./ImageModal.module.css";
+import ReactModal from "react-modal";
 
 const ImageModal = ({ photo, closeModal }) => {
   return (
