@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import "./App.css";
 import axios from "axios";
-import ImageGallery from "./components/ImageGallery/ImageGallery";
-import SearchBar from "./components/SearchBar/SearchBar";
-import Loader from "./components/Loader/Loader";
-import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
-import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
-import ImageCard from "./components/ImageCard/ImageCard";
-
+import { useState } from "react";
 import ReactDOM from "react-dom";
 import ReactModal from "react-modal";
+
+import Loader from "./components/Loader/Loader";
+import SearchBar from "./components/SearchBar/SearchBar";
+import ImageCard from "./components/ImageCard/ImageCard";
+import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import ImageGallery from "./components/ImageGallery/ImageGallery";
+
+import "./App.css";
 
 const customStyles = {
   content: {
@@ -26,18 +26,24 @@ const customStyles = {
 ReactModal.setAppElement("#root");
 
 function App() {
-  const [photos, setPhotos] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [photos, setPhotos] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+
   const perPage = 12;
   let response;
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value.trim());
+  };
+
+  const handleClick = () => {
+    setPhotos([]);
+    setCurrentPage(1);
   };
 
   const openModal = (photo) => {
@@ -107,19 +113,14 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    setPhotos([]);
-    setCurrentPage(1);
-  }, [searchValue]);
-
   return (
     <div>
       <SearchBar
+        handleClick={handleClick}
         searchValue={searchValue}
         handleSearchChange={handleSearchChange}
         onSubmit={onSubmit}
       />
-
       <ImageGallery photos={photos} openModal={openModal} />
       {photos && photos.length > 0 && <LoadMoreBtn onNextPage={onNextPage} />}
       {isLoading && <Loader />}
@@ -127,7 +128,6 @@ function App() {
       {(!photos || (photos.length === 0 && searchValue)) && !isLoading && (
         <ErrorMessage />
       )}
-
       <ReactModal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}

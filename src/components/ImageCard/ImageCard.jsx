@@ -1,4 +1,5 @@
 import styles from "./ImageCard.module.css";
+import ReactModal from "react-modal";
 
 const ImageCard = ({ photo, openModal }) => {
   return (

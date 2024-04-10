@@ -1,5 +1,5 @@
 const ErrorMessage = () => {
-  return <p> Oops, something wrong... </p>;
+  return <p> You have not found any images yet </p>;
 };
 
 export default ErrorMessage;
