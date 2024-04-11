@@ -5,6 +5,7 @@ import ReactDOM from "react-dom";
 import ReactModal from "react-modal";
 
 import Loader from "./components/Loader/Loader";
+import searchImages from "./services/api";
 import SearchBar from "./components/SearchBar/SearchBar";
 import ImageCard from "./components/ImageCard/ImageCard";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
@@ -56,50 +57,36 @@ function App() {
     setModalIsOpen(false);
   };
 
-  const onNextPage = async () => {
-    setCurrentPage(currentPage + 1);
-    setIsLoading(true);
-    try {
-      response = await axios.get("https://api.unsplash.com/search/photos/", {
-        headers: {
-          Authorization:
-            "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
-        },
-        params: {
-          query: searchValue,
-          per_page: perPage,
-          page: currentPage + 1,
-        },
-      });
-
-      setPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
-    } catch (error) {
-      setError(error);
-      console.error("Error fetching images:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
     if (!searchValue) {
       return;
-    } else {
+    }
+    const onNextPage = async () => {
+      setCurrentPage(currentPage + 1);
       setIsLoading(true);
       try {
-        response = await axios.get("https://api.unsplash.com/search/photos/", {
-          headers: {
-            Authorization:
-              "Client-ID a9z8qT1M8PxYiw2VDJFKFbmrBG_lR3Bwanizu8ioCKg",
-          },
-          params: {
-            query: searchValue,
-            per_page: perPage,
-            page: currentPage,
-          },
-        });
+        response = await searchImages(searchValue, currentPage);
+        setPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
+      } catch (error) {
+        setError(error);
+        console.error("Error fetching images:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    onNextPage();
+  }, [searchValue, currentPage]);
 
+  useEffect(() => {
+    if (!searchValue) {
+      return;
+    }
+    const onSubmit = async (event) => {
+      event.preventDefault();
+
+      setIsLoading(true);
+      try {
+        response = await searchImages(searchValue, currentPage);
         if (currentPage === 1) {
           setPhotos(response.data.results);
         } else {
@@ -111,8 +98,8 @@ function App() {
       } finally {
         setIsLoading(false);
       }
-    }
-  };
+    };
+  }, [searchValue]);
 
   return (
     <div>
