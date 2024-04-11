@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
 import ReactDOM from "react-dom";
@@ -36,16 +35,14 @@ function App() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  const perPage = 12;
-  let response;
-
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value.trim());
   };
 
-  const handleClick = () => {
+  const handleClick = (inputValue) => {
     setPhotos([]);
     setCurrentPage(1);
+    setSearchValue(query);
   };
 
   const openModal = (photo) => {
@@ -65,7 +62,7 @@ function App() {
       setCurrentPage(currentPage + 1);
       setIsLoading(true);
       try {
-        response = await searchImages(searchValue, currentPage);
+        const response = await searchImages(searchValue, currentPage);
         setPhotos((prevPhotos) => [...prevPhotos, ...response.data.results]);
       } catch (error) {
         setError(error);
@@ -81,6 +78,7 @@ function App() {
     if (!searchValue) {
       return;
     }
+
     const onSubmit = async (event) => {
       event.preventDefault();
 
